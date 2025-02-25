@@ -16,7 +16,7 @@ class QuanLySinhVien:
     def soLuongSinhVien(self):
         return self.listSV.__len__()
     
-    def themSinhVien(self, sv):
+    def themSinhVien(self):
         svID = self.generateID()
         name = input("Nhập tên sinh viên: ")
         sex = input("Nhập giới tính sinh viên: ")
