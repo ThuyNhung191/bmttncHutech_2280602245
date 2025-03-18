@@ -35,7 +35,7 @@ def transposition():
 
 
 # CAESAR
-@app.route("/caesar/encrypt", methods=["POST"])
+@app.route("/encrypt", methods=["POST"])
 def caesar_encrypt():
     text = request.form['InputPlainText']
     key = int(request.form['InputKeyPlain'])
@@ -43,7 +43,7 @@ def caesar_encrypt():
     encrypted_text = Caesar.encrypt(text, key)
     return f"text:{text}<br/>key: {key}<br/>encrypted text: {encrypted_text}"
 
-@app.route("/caesar/decrypt", methods=["POST"])
+@app.route("/decrypt", methods=["POST"])
 def caesar_decrypt():
     text = request.form['InputCipherText']
     key = int(request.form['InputKeyCipher'])

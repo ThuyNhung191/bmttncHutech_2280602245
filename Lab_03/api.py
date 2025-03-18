@@ -54,56 +54,66 @@ def rsa_decrypt():
     return jsonify({'decrypted_message': decrypted_message})  # Trả về thông điệp đã giải mã
 
 # Route để ký thông điệp bằng khóa riêng
+# @app.route('/api/rsa/sign', methods=['POST'])
+# def rsa_sign_message():
+#     data = request.json
+#     message = data['message']  # Lấy thông điệp cần ký
+#     private_key = rsa_cipher.load_keys()[1]  # Tải khóa riêng tư để ký
+#     signature = rsa_cipher.sign(message, private_key)  # Ký thông điệp bằng khóa riêng
+#     signature_hex = signature.hex()  # Chuyển đổi chữ ký thành chuỗi hex
+#     return jsonify({'signature': signature_hex})  # Trả về chữ ký dưới dạng hex
+
 @app.route('/api/rsa/sign', methods=['POST'])
 def rsa_sign_message():
     data = request.json
     message = data['message']  # Lấy thông điệp cần ký
-    private_key = rsa_cipher.load_keys()[1]  # Tải khóa riêng tư để ký
+    private_key, _ = rsa_cipher.load_keys()  # Đảm bảo sử dụng private_key để ký
     signature = rsa_cipher.sign(message, private_key)  # Ký thông điệp bằng khóa riêng
     signature_hex = signature.hex()  # Chuyển đổi chữ ký thành chuỗi hex
     return jsonify({'signature': signature_hex})  # Trả về chữ ký dưới dạng hex
 
-# Route để xác thực chữ ký RSA
+
 @app.route('/api/rsa/verify', methods=['POST'])
 def rsa_verify_signature():
     data = request.json
-    message = data['message']  # Lấy thông điệp cần xác thực
-    signature = data['signature']  # Lấy chữ ký cần xác thực
-    public_key = rsa_cipher.load_keys()[0]  # Tải khóa công khai để xác thực chữ ký
-    is_verified = rsa_cipher.verify(message, signature, public_key)  # Kiểm tra chữ ký
-    return jsonify({'is_verified': is_verified})  # Trả về kết quả xác thực chữ ký (True/False)
+    message = data['message']
+    signature_hex = data['signature']
+    public_key, _ = rsa_cipher.load_keys()
+    signature = bytes.fromhex(signature_hex)
+    is_verified = rsa_cipher.verify(message, signature, public_key)
+    return jsonify({'is_verified': is_verified})
+
 
 # ================================================================================================
-# Thêm đoạn này trước hàm main
 
 # ECC CIPHER ALGORITHM
 ecc_cipher = ECCCipher()
 
+# Endpoint để tạo khóa ECC
 @app.route('/api/ecc/generate_keys', methods=['GET'])
-def ecc_generate_keys():
-    # Tạo cặp khóa ECC
+def ec_generate_keys():
     ecc_cipher.generate_keys()
-    return jsonify({'message': 'Keys generated successfully'})
+    return jsonify({'message': 'ECC keys generated successfully'})
 
+# Endpoint để ký thông điệp bằng ECC
 @app.route('/api/ecc/sign', methods=['POST'])
-def ecc_sign_message():
-    # Ký thông điệp bằng khóa riêng tư
+def ec_sign_message():
     data = request.json
     message = data['message']
-    private_key, _ = ecc_cipher.load_keys()  # Tải khóa riêng
-    signature = ecc_cipher.sign(message, private_key)  # Ký thông điệp
-    signature_hex = signature.hex()  # Chuyển chữ ký thành dạng hex
+    private_key, _ = ecc_cipher.load_keys()
+    signature = ecc_cipher.sign(message, private_key)
+    signature_hex = signature.hex()
     return jsonify({'signature': signature_hex})
 
+# Endpoint để xác thực chữ ký ECC
 @app.route('/api/ecc/verify', methods=['POST'])
-def ecc_verify_signature():
-    # Xác minh chữ ký
+def ec_verify_signature():
     data = request.json
     message = data['message']
     signature_hex = data['signature']
-    public_key, _ = ecc_cipher.load_keys()  # Tải khóa công khai
-    signature = bytes.fromhex(signature_hex)  # Chuyển chữ ký từ hex
-    is_verified = ecc_cipher.verify(message, signature, public_key)  # Kiểm tra chữ ký
+    public_key, _ = ecc_cipher.load_keys()
+    signature = bytes.fromhex(signature_hex)
+    is_verified = ecc_cipher.verify(message, signature, public_key)
     return jsonify({'is_verified': is_verified})
 
 

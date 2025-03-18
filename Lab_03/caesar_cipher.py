@@ -29,7 +29,7 @@ class MyApp(QMainWindow):
             else:
                 print("Error while calling API")
         except requests.exceptions.RequestException as e:
-            print("Error: %s" % e.message)
+            print("Error: %s" % str(e))
 
     def call_api_decrypt(self):
         url = "http://127.0.0.1:5000/api/caesar/decrypt"
